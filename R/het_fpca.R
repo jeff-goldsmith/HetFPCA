@@ -239,10 +239,10 @@ het_fpca <- function (X, Y=NULL, V=NULL,
       }
       if (is.null(het.model.matrix)){
         if (tol.mean) break
-        cat("Diff.mean", diff.mean, "\n")
+        message("Diff.mean", diff.mean, "\n")
       } else {
         if (tol.mean & tol.var & j > 5) break
-        cat("Diff.mean", diff.mean, "Diff.var", diff.var, "\n")
+      	message("Diff.mean", diff.mean, "Diff.var", diff.var, "\n")
       }
     }
     old.objective.mean <- current.objective.mean
@@ -250,13 +250,18 @@ het_fpca <- function (X, Y=NULL, V=NULL,
     j <- j + 1
   }
   if (!is.null(het.model.matrix)){
-    g_mean <- do.call('cbind', g_mean_l)
+    g_mean = do.call('cbind', g_mean_l)
+    var_coef = tribble(~coef, ~se, ~t_stat,
+    									 g_mean[1,1], sqrt(g_cov_l[[1]][1,1]), abs(g_mean[1,1]) / sqrt(g_cov_l[[1]][1,1]),
+    									 g_mean[2,1], sqrt(g_cov_l[[1]][2,2]), abs(g_mean[2,1]) / sqrt(g_cov_l[[1]][2,2]))
   } else {
   	g_mean = NULL
+  	var_coef = NULL
   }
   ret = list(fixef = fixef.cur,
   					 ranef = ranef.cur,
   					 pcaef = pcaef.cur,
+  					 var_coef = var_coef,
   					 psi.cur=psi.cur,
              g_mean=g_mean, g_cov=g_cov_l,
              mu.q.beta=mu.q.beta, mu.q.Bpsi=mu.q.Bpsi, mu.q.BZ=mu.q.BZ,
